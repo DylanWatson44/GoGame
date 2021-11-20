@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"strings"
+	"strconv"
 
-	"example/my-game/actor"
 	"example/my-game/actor/player"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -13,7 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-var thePlayer *actor.Actor
+var thePlayer *player.Player
 
 func init() {
 	thePlayer = player.InstantiatePlayer()
@@ -25,10 +23,9 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	fmt.Println("keys before ", g.keys)
 	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
-	fmt.Println("keys after ", g.keys)
 	g.currentGameFrame++
+	thePlayer.Update()
 	return nil
 }
 
@@ -38,13 +35,15 @@ const (
 )
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	thePlayer.Draw(screen, g.currentGameFrame)
+	thePlayer.Actor.Draw(screen, g.currentGameFrame)
 
 	keyStrs := []string{}
 	for _, p := range g.keys {
 		keyStrs = append(keyStrs, p.String())
 	}
-	ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
+	numroutines := len(thePlayer.Actor.SubRoutines)
+	ebitenutil.DebugPrint(screen, "num routines "+strconv.Itoa(numroutines))
+	//ebitenutil.DebugPrint(screen, strings.Join(keyStrs, ", "))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

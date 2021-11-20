@@ -50,6 +50,7 @@ func (sprite Sprite) GetFrame(currentGameFrame int) *ebiten.Image {
 	currentFrameX := currentFrame * sprite.FrameWidth
 	currentFrameY := 0
 	var currentFrameRect image.Rectangle = image.Rect(currentFrameX, currentFrameY, currentFrameX+sprite.FrameWidth, currentFrameY+sprite.FrameHeight)
+
 	var subImg image.Image = sprite.SpriteSheet.SubImage(currentFrameRect)
 	var imgObj *ebiten.Image = subImg.(*ebiten.Image)
 
