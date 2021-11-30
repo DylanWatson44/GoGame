@@ -1,6 +1,8 @@
 package actor
 
 import (
+	"example/my-game/geometry/shapes"
+	"example/my-game/geometry/vector"
 	"example/my-game/sprite"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,18 +20,16 @@ const (
 )
 
 type Actor struct {
-	State                 int32
-	Sprites               map[int32]*sprite.Sprite
-	CurrentSprite         *sprite.Sprite
-	Facing                FacingDirection
-	CurrentFrame          int32
-	X, Y                  float64
-	VelocityX, VelocityY  float64
-	AccelX, AccelY        float64
-	MaxAccel, MaxVelocity float64
-	Stopping              bool
-	StopSpeed             float64
-	SubRoutines           []<-chan bool
+	State                            int32
+	Sprites                          map[int32]*sprite.Sprite
+	CurrentSprite                    *sprite.Sprite
+	Facing                           FacingDirection
+	CurrentFrame                     int32
+	Position, Velocity, Acceleration vector.Vector
+	MaxAccel, MaxVelocity            float64
+	Stopping                         bool
+	StopSpeed                        float64
+	SubRoutines                      []<-chan bool
 }
 
 func (actor *Actor) ManageSubRoutines() {
@@ -54,10 +54,38 @@ func (actor *Actor) Draw(screen *ebiten.Image, currentGameFrame int) {
 	if actor.Facing == Left {
 		options.GeoM.Scale(-1, 1)
 	}
-	options.GeoM.Translate(-float64(actor.CurrentSprite.FrameWidth)/2, -float64(actor.CurrentSprite.FrameHeight)/2)
-	options.GeoM.Translate(actor.X, actor.Y)
-
 	var imgObj *ebiten.Image = actor.CurrentSprite.GetFrame(currentGameFrame)
 
+	width, height := imgObj.Size()
+	options.GeoM.Translate(-float64(width)/2, -float64(height)/2)
+	options.GeoM.Translate(actor.Position.X, actor.Position.Y)
+
+
+	// options.ColorM.Scale(1, 1, 1, 0)
+	// // Set color
+	// options.ColorM.Translate(0, 0, 0, 1)
+
 	screen.DrawImage(imgObj, options)
+}
+
+func (actor *Actor) GetHitBoxAt(position vector.Vector) shapes.Quad {
+	var horizontalOffset float64 = float64(actor.CurrentSprite.FrameWidth-actor.CurrentSprite.HotizontalPadding) / 2
+	var verticalOffset float64 = float64(actor.CurrentSprite.FrameHeight-actor.CurrentSprite.VerticalPadding) / 2
+
+	topLeft := vector.Vector{X: (position.X - horizontalOffset), Y: (position.Y - verticalOffset)}
+
+	topRight := vector.Vector{X: (position.X + horizontalOffset), Y: (position.Y - verticalOffset)}
+
+	bottomLeft := vector.Vector{X: (position.X - horizontalOffset), Y: (position.Y + verticalOffset)}
+
+	bottomRight := vector.Vector{X: (position.X + horizontalOffset), Y: (position.Y + verticalOffset)}
+
+	hitbox := shapes.Quad{
+		TopLeft:     topLeft,
+		TopRight:    topRight,
+		BottomLeft:  bottomLeft,
+		BottomRight: bottomRight,
+	}
+
+	return hitbox
 }

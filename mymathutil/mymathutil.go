@@ -9,3 +9,11 @@ func ClampFloat64(val, low, high float64) float64 {
 	}
 	return val
 }
+
+func ReduceToSignedUnit(num float64) int {
+	if num >= 0 {
+		return 1
+	} else {
+		return -1
+	}
+}

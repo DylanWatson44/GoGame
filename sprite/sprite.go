@@ -16,7 +16,7 @@ type Sprite struct {
 	FrameWidth, FrameHeight            int
 	numFrames                          int
 	rows                               int
-	hotizontalPadding, verticalPadding int
+	HotizontalPadding, VerticalPadding int
 	frameSpeed                         int
 }
 
@@ -37,8 +37,8 @@ func NewSprite(spriteSheetFileLocation string, frameWidth, frameHeight, numFrame
 	newSprite.FrameWidth = frameWidth
 	newSprite.numFrames = numFrames
 	newSprite.rows = rows
-	newSprite.hotizontalPadding = hotizontalPadding
-	newSprite.verticalPadding = verticalPadding
+	newSprite.HotizontalPadding = hotizontalPadding
+	newSprite.VerticalPadding = verticalPadding
 	newSprite.frameSpeed = frameSpeed
 
 	return newSprite
@@ -49,7 +49,7 @@ func (sprite Sprite) GetFrame(currentGameFrame int) *ebiten.Image {
 
 	currentFrameX := currentFrame * sprite.FrameWidth
 	currentFrameY := 0
-	var currentFrameRect image.Rectangle = image.Rect(currentFrameX, currentFrameY, currentFrameX+sprite.FrameWidth, currentFrameY+sprite.FrameHeight)
+	var currentFrameRect image.Rectangle = image.Rect(currentFrameX, currentFrameY+sprite.VerticalPadding, currentFrameX+sprite.FrameWidth-sprite.HotizontalPadding, currentFrameY+sprite.FrameHeight)
 
 	var subImg image.Image = sprite.SpriteSheet.SubImage(currentFrameRect)
 	var imgObj *ebiten.Image = subImg.(*ebiten.Image)
